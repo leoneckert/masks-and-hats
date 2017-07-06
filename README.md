@@ -6,3 +6,6 @@ This is a toolkit for making silly (or not silly) masks and hats and put them on
 <br>The foundation of the other script, `apply_mask.py` is [this tutorial](http://www.learnopencv.com/face-morph-using-opencv-cpp-python/). 
 <br><br>Please also check out [previous explorations](http://leoneckert.com/projects/anonymizme/) of mine in which I mainly had fun with replacing faces with *visually similar* ones as retrieved from search engines in real time. 
 
+![](https://raw.githubusercontent.com/leoneckert/masks-and-hats/master/mask.gif)
+
+
