@@ -1,4 +1,4 @@
-import random, os
+import random, os, sys, subprocess, time, shutil
 import cv2
 import dlib
 import numpy as np
@@ -9,48 +9,40 @@ import numpy as np
 detector = dlib.get_frontal_face_detector()
 PREDICTOR_PATH = "shape_predictor_68_face_landmarks.dat"
 predictor = dlib.shape_predictor(PREDICTOR_PATH)
-MASK_DIR = "masks/"
 
 
-def load_masks():
-    onlyfiles = [f for f in os.listdir(MASK_DIR) if os.path.isfile(os.path.join(MASK_DIR, f)) and (f.endswith("jpg") or f.endswith("png"))]
-    fronts = [f for f in onlyfiles if f.split(".")[0].endswith("front") and f.endswith(".png")]
-    backs = [f for f in onlyfiles if f.split(".")[0].endswith("back") and f.endswith(".jpg")]
-    # make pairs
-    masks = dict()
-    for f in fronts:
-        name = f.split("_")[0]
-        for ff in backs:
-            name_ = ff.split("_")[0]
-            if name == name_:
-                masks[name] = {
-                        "front": f,
-                        "back": ff
-                        }
-    return masks
 
-def get_random_mask(masks):
+def get_random_mask(masks, not_used, unique):
+    # someone wants to explain random seed to me?
+    # tried various weird things like random.seed(int(time.time()))
+    # here without real success
+    # problem is when going through a folder of images
+    # the first mask will often (?) be the same
+    # or is it just me ????????
+    chosen = ""
     names = [m for m in masks]
-    ran = random.choice(names)
-    return get_img( os.path.join(MASK_DIR, masks[ran]["front"] ), True), get_img(os.path.join(MASK_DIR, masks[ran]["back"] ))
-
-# def show_img_with_rectangle(img, rect):
-    # img_with_rect = img.copy()
-    # x, y, h, w = rect.left(), rect.top(), rect.width(), rect.height()
-    # cv2.rectangle(img_with_rect, (x, y), (x + w, y + h), (0, 255, 0), 2)
-    # cv2.imshow("face with rectangle", img_with_rect)
-    # cv2.waitKey(0)
-
-# def show_img_with_landmarks(img, landmarks, name="face_with_landmarks"):
-    # img_with_landmarks = img.copy()
-    # for idx, point in enumerate(landmarks):
-        # pos = (point[0, 0], point[0, 1])
-        # cv2.circle(img_with_landmarks,pos, 1, (0,0,255), -1)
-    # cv2.imshow(name, img_with_landmarks)
-    # cv2.waitKey(0)
-
+    not_used_names = [m for m in not_used]
+    if unique == True:
+        if len(not_used_names) == 0:
+            front = None
+            back = None
+            chosen = None
+            # print "used all masks"
+        else:
+            ran = random.choice(not_used_names)
+            front = get_img(  masks[ran]["front"] , mask=True )
+            back = get_img(  masks[ran]["back"] )
+            not_used.pop(ran, None)  
+            chosen = ran
+    else:
+        ran = random.choice(names)
+        front = get_img(  masks[ran]["front"] , mask=True )
+        back = get_img(  masks[ran]["back"] )
+        chosen = ran
+    return chosen, front, back, not_used
+    
 def add_alpha_channel(img):
-    img = cv2.imread(path)
+    # img = cv2.imread(path)
     b_channel, g_channel, r_channel = cv2.split(img)
     alpha_channel = np.ones(b_channel.shape, dtype=b_channel.dtype) * 255 #creating a dummy alpha channel image.
     return cv2.merge((b_channel, g_channel, r_channel, alpha_channel))
@@ -59,7 +51,6 @@ def remove_alpha_channel(img):
     return img[:,:,:3]
 
 def get_img(path, mask=False):
-    print "[+] Opened image from:", path
     if mask:
         return cv2.imread(path, cv2.IMREAD_UNCHANGED)
     else:
@@ -67,7 +58,6 @@ def get_img(path, mask=False):
 
 def get_rects(img):
     rects = detector(img)
-    print "[+] Number of faces found:", len(rects)
     return rects
 
 def get_landmarks(img, rect):
@@ -120,63 +110,130 @@ def sort_faces_by_size(faces):
     pairs.sort(key=lambda x: x[1])
     return [f[0] for f in pairs]
 
-def encrypt_faces(path):
-    img = get_img(path)
+def assert_dir(dir_path):
+    potential_out_dir = dir_path
+    idx = -1
+    while os.path.isdir(potential_out_dir):
+        idx += 1
+        if idx == 0:
+            potential_out_dir += "_0"
+            continue
+        potential_out_dir = "_".join( potential_out_dir.split("_")[:-1] ) +  "_" + str(idx)  
+    out_dir = potential_out_dir
+    os.mkdir(out_dir)
+    print "[+] Created " + out_dir + ". and will save output to that directory" 
+    return out_dir
 
-    # find all faces
-    faces = get_rects(img)
-    if len(faces) == 0:
-        print "no faces found"
-        return
-    masks = load_masks()
+def apply_masks(input_paths, masks, output_paths, apply_unique_masks, is_video):
+            
+    print "[+] Applying mask(s)" 
+    for j, path in enumerate(input_paths, 0):
+        print "\n\t[+] Opening", path
+        img = get_img(path)
     
-    out = img.copy()
-    
-    #sort faces by size, start with the smallest
-    faces = sort_faces_by_size(faces)
-    
-    # # interate over faces
-    
-    for i, face in enumerate(faces, 0):
-        # pick random mask for face
-        mask_front, mask_back = get_random_mask(masks)
-        mask_face = get_rects(mask_back)[0]
+        # find all faces
+        faces = get_rects(img)
+        if len(faces) == 0:
+            print "\t[-] no faces found"
+            if is_video == True:
+                temp_dir = "/".join( path.split("/")[:-1]) 
+                f = path.split("/")[-1]
+                temp_out = temp_dir + "_masked"
+                if not os.path.isdir(temp_out):
+                    os.mkdir(temp_out)
+                output_path = os.path.join( temp_out, f) 
+                print "\t[+] Saving as", output_path
+                cv2.imwrite(output_path, img)
+            continue
+        print "\t[+] Found", len(faces), "faces"
+        out = img.copy()
 
-        # # get landmarks
-        img = remove_alpha_channel(img)
-        face_ldmks = get_landmarks(img, face)
-        mask_ldmks = get_landmarks(mask_back, mask_face)
-
-        # # align mask to face
-        img = add_alpha_channel(img) 
-        aligned_mask = align_mask_img(face_ldmks, img, mask_ldmks, mask_front)
-	
-	
-        x_offset=y_offset=0
-        try:
-            for c in range(0,3):
-                out[0:out.shape[0],0:out.shape[1], c] =  aligned_mask[:,:,c] * (aligned_mask[:,:,3]/255.0) +  out[0:out.shape[0], 0:out.shape[1], c] * (1.0 - aligned_mask[:,:,3]/255.0)
-        except Exception, e:
-            print e
-            pass
-	
-    out_path = ".".join(path.split(".")[:-1]) + "_masked." + path.split(".")[-1] 
-    cv2.imwrite(out_path, out)
-    
-
-
+        #sort faces by size, start with the smallest
+        faces = sort_faces_by_size(faces)
         
+        masks_not_used = masks.copy()
+        for i, face in enumerate(faces, 0):
+            print "\t\t[face " + str(i+1) + "]", 
+            # pick a random mask, check if unique mask was selected 
+            mask_name, mask_front, mask_back, masks_not_used = get_random_mask(masks, masks_not_used, apply_unique_masks)
+            if mask_name == None:
+                print "already used all masks once (you specified '-u' unique mask use)"
+                continue
+            
+            print "picked mask", mask_name
+            mask_face = get_rects(mask_back)[0]
+
+            #get landmarks
+            img = remove_alpha_channel(img)
+            face_ldmks = get_landmarks(img, face)
+            mask_ldmks = get_landmarks(mask_back, mask_face)
+
+            # # align mask to face
+            img = add_alpha_channel(img) 
+            aligned_mask = align_mask_img(face_ldmks, img, mask_ldmks, mask_front)
+            
+            x_offset=y_offset=0
+            try:
+                for c in range(0,3):
+                    out[0:out.shape[0],0:out.shape[1], c] =  aligned_mask[:,:,c] * (aligned_mask[:,:,3]/255.0) +  out[0:out.shape[0], 0:out.shape[1], c] * (1.0 - aligned_mask[:,:,3]/255.0)
+            except Exception, e:
+                print e
+                pass
         
-
-
-
-
+        if not is_video:
+            print "\t[+] Saving as", output_paths[j] 
+            cv2.imwrite(output_paths[j], out)
+        else:
+            temp_dir = "/".join( path.split("/")[:-1]) 
+            f = path.split("/")[-1]
+            temp_out = temp_dir + "_masked"
+            if not os.path.isdir(temp_out):
+                os.mkdir(temp_out)
+            output_path = os.path.join( temp_out, f) 
+            print "\t[+] Saving as", output_path
+            cv2.imwrite(output_path, out)
         
+    if is_video == True:
+        temp_dir = "/".join( path.split("/")[:-1]) 
+        f = path.split("/")[-1]
+        temp_out = temp_dir + "_masked"
+        
+        print "[+] Combining frames to video"
+        print """
+        This uses ffmpeg, which you hopefully have installed.
+        Also not sound supported yet.... would be a few changes in the ffmpeg commands,
+        but I thought it was fine for now.
+        """
+        fps = '25'
+        if os.path.isfile( os.path.join(temp_dir, "fps.txt")):
+            fps = open( os.path.join( temp_dir, "fps.txt")).read().strip()
+        
+        subprocess.call(["ffmpeg", "-r", fps,  "-f", "image2", "-i",  os.path.join(temp_out, "frame%10d.jpg"), "-r", fps, os.path.join(temp_out, "video.mp4")  ])
+            
+        if os.path.isfile( os.path.join(temp_dir, "sound.aac")):
+            
+            subprocess.call(["ffmpeg",  "-i", os.path.join(temp_out,"video.mp4"), "-i",  os.path.join(temp_dir, "sound.aac"), "-c:v", "copy", "-c:a", "aac", "-strict", "experimental", "-r", fps, output_paths[0]  ])
+        else:
+            shutil.move( os.path.join(temp_out, "video.mp4"), output_paths[0])
+        print "\t[+] Cleaning up after myself"
+        
+        shutil.rmtree(temp_dir)
+        shutil.rmtree(temp_out)
+        print "\t[+] Saving as", output_paths[0]
+
 
 
 
 if __name__ == "__main__":
-    import sys
-    path = sys.argv[1]
+    import argparse
+    parser = argparse.ArgumentParser(description="This is a script to apply silly masks to faces found in images. Are you sure you want this? If yes, please enjoy.") 
+    parser.add_argument("-i", "--input", required=True, type=str, help="path to image, video or folder of images")
+    parser.add_argument("-m", "--mask", required=True, type=str, help="path to folder of mask files or indivual mask file (front or back)")
+    parser.add_argument("-u", "--unique", action="store_true", help="use each mask just once per image/frame. OFF by default")
+    parser.add_argument("-o", "--output", required=True, type=str, help="path to directory or specify filename with .jpg/.png/.mp4/.mov extension.")
+    args = parser.parse_args()
 
-    encrypt_faces(path)
+    from tools import validate_inputs
+    input_paths, masks, output_paths, apply_unique_masks, is_video =  validate_inputs.run(args)
+    
+    apply_masks(input_paths, masks, output_paths, apply_unique_masks, is_video)

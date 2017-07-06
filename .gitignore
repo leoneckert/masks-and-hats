@@ -6,6 +6,26 @@ shape_predictor*
 group.jpg
 leonpass.jpg
 .DS_Store
+shape_predictor_68_face_landmarks.dat
+*.dat
+faces
+masks*
+
+
+env/
+*.pyc
+*.jpg
+*.json
+*.mp4
+*.html
+*.pdf
+data/
+eyefield/
+eyefield2/
+masks/
+eyes/
+images/
+people/
 
 reated by https://www.gitignore.io/api/osx,python,opencv,virtualenv
 
@@ -158,3 +178,22 @@ pyvenv.cfg
 pip-selfcheck.json
 
 # End of https://www.gitignore.io/api/osx,python,opencv,virtualenv
+
+
+# Created by https://www.gitignore.io/api/vim
+#
+# ### Vim ###
+# # swap
+# [._]*.s[a-v][a-z]
+# [._]*.sw[a-p]
+# [._]s[a-v][a-z]
+# [._]sw[a-p]
+# # session
+# Session.vim
+# # temporary
+# .netrwhist
+# *~
+# # auto-generated tag files
+# tags
+#
+# # End of https://www.gitignore.io/api/vim
