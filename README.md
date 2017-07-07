@@ -79,7 +79,7 @@ I was planning to get rid of the Stasm dependency as I am much more experienced 
 <br>
 Maybe I will write a second version one day that does more elaborate face morphing - I have experimented with that some month ago producing fun things like this:
 
-![](https://raw.githubusercontent.com/leoneckert/masks-and-hats/master/imgs/morph.gif =250x)
+![](https://raw.githubusercontent.com/leoneckert/masks-and-hats/master/imgs/morph.gif)
 
 That’s it hopefully someone produces fun outputs with this script!
 
