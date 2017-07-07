@@ -1,9 +1,8 @@
-examples/masked
-examples/scary_masks
+masked
+scary_masks
 *.swp
 env
 _*
-masks
 shape_predictor*
 *.psd
 group.jpg
@@ -11,13 +10,11 @@ leonpass.jpg
 .DS_Store
 shape_predictor_68_face_landmarks.dat
 *.dat
-faces
 masks*
 
 
 env/
 *.pyc
-*.jpg
 *.json
 *.mp4
 *.html
