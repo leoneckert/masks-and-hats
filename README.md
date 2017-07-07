@@ -13,7 +13,7 @@ This is a toolkit for making silly (or not silly) masks and hats and put them on
 ## Usage Guidelines
 After having all the dependencies installed, you can try running some test commands. I provided some photos of random people and example masks to play with. Every command can be run with the `-h` flag as well to show the options. 
 
-### Drawn masks and hats
+### Apply drawn masks and hats
 
 <br>Let’s start with a classic:
 
@@ -32,12 +32,19 @@ After running this command, you will hopefully find something like this:
 <br>Now let’s put hats, hats are always fun and I drew one for you:
 
 ```
-python apply_mask.py -i examples/groups/group1.jpg -m examples/hats -o examples/masked/group_w_hats.jpg 
+$ python apply_mask.py -i examples/groups/group1.jpg -m examples/hats -o examples/masked/group_w_hats.jpg 
 ```
 
 Same idea, the output looks hopefully like this:
 ![](https://raw.githubusercontent.com/leoneckert/masks-and-hats/master/imgs/output_02.jpg)
 
+### Draw your own masks and hats!
+
+You see that each mask consists of two files, a reference image containing a face (the more passport style the better) and a transparent png image with the mask. Both image files NEED TO HAVE THE SAME DIMENSIONS. The logic behind this is explained further below. 
+<br>
+I am aware not everyone has or knows how to use photoshop, but if you don’t maybe a friend does? The `mask_template.psd` can be used to draw your own masks. Simply draw whatever you want on the top layer, then *hide* the Putin and save it as `[mask name of your choice]_front.png`. Then save the Putin as `[same name as you chose before]_back.jpg` - the naming convention is the only important thing here. If you want to go bigger and draw real big things, simply increase the size of the image, so that both layers are increased, too.
+
+![](https://raw.githubusercontent.com/leoneckert/masks-and-hats/master/imgs/template.jpg)
 
 
 
@@ -45,7 +52,7 @@ Same idea, the output looks hopefully like this:
 
 
 
-### Logic behind this script
+## Logic behind this script
 Here is three simple steps to *morph* one face onto another.
 
 1) Detect faces.
