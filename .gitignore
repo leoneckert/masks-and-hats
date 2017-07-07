@@ -1,3 +1,5 @@
+examples/masked
+examples/scary_masks
 *.swp
 env
 _*
