@@ -4,7 +4,6 @@ scary_masks
 env
 _*
 shape_predictor*
-*.psd
 group.jpg
 leonpass.jpg
 .DS_Store
