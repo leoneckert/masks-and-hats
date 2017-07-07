@@ -19,7 +19,11 @@ After having all the dependencies installed, you can try running some test comma
 $ python apply_mask.py -i examples/faces -m examples/masks -o examples/masked
 ```
 
-This means we apply masks to all the faces found on all the images in the examples/faces directory. The masks we apply are found in examples/masks and the output images should be saved to examples/masked. Check if that directory exists and good results are inside after you run this. Hopefully it looks something like:
+`-i examples/faces` means we apply masks to all the faces found on all the images in the examples/faces directory. 
+` -m examples/masks` defines where to look for masks to apply and 
+`-o examples/masked` where to save the output the output. 
+
+After running this command, you will hopefully find something like this:
 ![](https://raw.githubusercontent.com/leoneckert/masks-and-hats/master/imgs/output_01.jpg)
 
 
