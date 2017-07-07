@@ -196,9 +196,12 @@ Almost forgot we need the facial landmarks prediction model for dlib!
 Download the file you find at [https://github.com/biometrics/openbr-models/blob/master/dlib/shape_predictor_68_face_landmarks.dat](https://github.com/biometrics/openbr-models/blob/master/dlib/shape_predictor_68_face_landmarks.dat) and just put it into the root of your project folder.
 
 <br>
+
 At this point, after going through above installations all the commands using `apply_mask.py` should work. 
+
 <br>
 <br>
+
 To use `create_mask.py`, we need Stasm. I installed it following this:
 
 [https://github.com/alyssaq/stasm_build#build-instructions](https://github.com/alyssaq/stasm_build#build-instructions) 
