@@ -58,6 +58,14 @@ $ python create_mask.py -i examples/faces -o examples/scary_masks
 This looks for all faces on all images found in `-i examples/faces`, creates masks and saves them to `-o examples/scary_masks`.
 ![](https://raw.githubusercontent.com/leoneckert/masks-and-hats/master/imgs/scary_masks.jpg)
 
+<br>
+Now of course we can apply out new masks by running something like
+```
+$ python apply_mask.py -i examples/groups/group1.jpg -o examples/masked -m examples/scary_masks
+```
+and get out something like (just not as a gif of course):
+
+![](https://raw.githubusercontent.com/leoneckert/masks-and-hats/master/imgs/scary_masks_applied.gif)
 
 
 
