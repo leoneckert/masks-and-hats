@@ -20,7 +20,7 @@ $ python apply_mask.py -i examples/faces -m examples/masks -o examples/masked
 ```
 
 This means we apply masks to all the faces found on all the images in the examples/faces directory. The masks we apply are found in examples/masks and the output images should be saved to examples/masked. Check if that directory exists and good results are inside after you run this. Hopefully it looks something like:
-![](https://raw.githubusercontent.com/leoneckert/masks-and-hats/master/imgs/output-01.jpg)
+![](https://raw.githubusercontent.com/leoneckert/masks-and-hats/master/imgs/output_01.jpg)
 
 
 
