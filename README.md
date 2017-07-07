@@ -47,6 +47,16 @@ I am aware not everyone has or knows how to use photoshop, but if you don’t ma
 ![](https://raw.githubusercontent.com/leoneckert/masks-and-hats/master/imgs/template.jpg)
 
 
+### Create masks from *real* faces
+
+This part of the script uses code by [Sam Lavigne](http://lav.io) who is. the. best. 
+<br>
+Let’s run this:
+```
+$ python create_mask.py -i examples/faces -o examples/scary_masks
+```
+This looks for all faces on all images found in `-i examples/faces`, creates masks and saves them to `-o examples/scary_masks`.
+![](https://raw.githubusercontent.com/leoneckert/masks-and-hats/master/imgs/scary_masks.jpg)
 
 
 
