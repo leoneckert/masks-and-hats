@@ -73,7 +73,11 @@ and get out something like (just not as a gif of course):
 <br><br>
 #### A few more notes:
 
-- The `apply_masks.py` script also works with videos if you have ffmpeg installed - it’s an experiment, our experiment. 
+- The `apply_mask.py` script also works with videos if you have ffmpeg installed - it’s an experiment, our experiment. 
+
+- There is an `-u` flag to be used with the `apply_mask.py` script. It stands for “unique” and means that if you give it a folder full of masks it makes sure each mask is only used once
+
+- There is an `-n` option for the `create_maks.py` script and it simply means you can define the name (everything before ‘_front.png’/‘_back.jpg’) yourself.
 
 - I was planning to get rid of the Stasm dependency as I am much more experienced with dlib, but I couldn’t find a way to make dlib detect a equally good mask-like cut of the face (it cuts of the fore head with its most popular model…). 
 
@@ -81,8 +85,7 @@ and get out something like (just not as a gif of course):
 
 ![](https://raw.githubusercontent.com/leoneckert/masks-and-hats/master/imgs/morph_.gif)
 
-That’s it hopefully someone produces fun outputs with this script!
-
+That’s it.
 
 
 ## Logic behind this script
