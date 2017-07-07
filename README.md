@@ -70,6 +70,19 @@ and get out something like (just not as a gif of course):
 ![](https://raw.githubusercontent.com/leoneckert/masks-and-hats/master/imgs/scary_masks_applied.gif)
 
 
+<br><br>
+#### A few more notes:
+
+The `apply_masks.py` script also works with videos if you have ffmpeg installed - it’s an experiment, our experiment. 
+<br>
+I was planning to get rid of the Stasm dependency as I am much more experienced with dlib, but I couldn’t find a way to make dlib detect a equally good mask-like cut of the face (it cuts of the fore head with its most popular model…). 
+<br>
+Maybe I will write a second version one day that does more elaborate face morphing - I have experimented with that some month ago producing fun things like this:
+
+![](https://raw.githubusercontent.com/leoneckert/masks-and-hats/master/imgs/morph.gif)
+
+That’s it hopefully someone produces fun outputs with this script!
+
 
 
 ## Logic behind this script
